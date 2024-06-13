@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import UserModel from "../../../../model/User";
 import { dbConnect } from "../../../../lib/dbConnect";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -43,17 +44,17 @@ export const authOptions: NextAuthOptions = {
         }
       },
     }),
-    //  GoogleProvider({
-    //   clientId: process.env.GOOGLE_ID,
-    //   clientSecret: process.env.GOOGLE_SECRET,
-    //   authorization: {
-    //     params: {
-    //       prompt: "consent",
-    //       access_type: "offline",
-    //       response_type: "code"
-    //     }
-    //   }
-    // })
+    GoogleProvider({
+      clientId: process.env.GOOGLE_ID as string,
+      clientSecret: process.env.GOOGLE_SECRET as string,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
+    })
   ],
   pages: {
     signIn: "/sign-in",
@@ -80,6 +81,28 @@ export const authOptions: NextAuthOptions = {
         session.user.username = token.username ?? "";
       }
       return session;
+    },
+    async signIn({ user, account, profile }) {
+      if (account && account.provider === "google") {
+        if (profile && profile.email && !profile?.email.endsWith("@alloweddomain.com")) {
+          return false;
+        }
+      }
+      return true;
+    },
+  },
+  events: {
+    async createUser(message) {
+      const { user } = message;
+      // Custom logic for new user creation
+      // For example, you might want to initialize some user-specific data in your database
+      await UserModel.create({
+        where: { id: user.id },
+        data: {
+          // Add any additional fields you want to initialize
+          profileCompleted: false, // Example field
+        },
+      });
     },
   },
 };

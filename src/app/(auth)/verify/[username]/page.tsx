@@ -1,11 +1,5 @@
 "use client"
-import { useToast } from '@/components/ui/use-toast';
-import { useForm } from "react-hook-form"
-import React, { useState, useEffect } from 'react'
-import { verifySchema } from '@/schemas/verifySchema';
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from 'zod';
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
@@ -13,17 +7,24 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { useParams, useRouter } from 'next/navigation';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useToast } from '@/components/ui/use-toast';
+import { verifySchema } from '@/schemas/verifySchema';
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useForm } from "react-hook-form";
+import * as z from 'zod';
+import '../../../../app/globals.css';
 
 const VeriyAccount = () => {
     const router = useRouter();
     const params = useParams<{ username: string }>();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { toast } = useToast();
-    const [remainingTime, setRemainingTime] = useState(3600); 
+    const [remainingTime, setRemainingTime] = useState(3600);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -93,13 +94,9 @@ const VeriyAccount = () => {
         }
     }
     return (
-        <div className='min-h-screen bg-gray-100  flex flex-col gap-12 relative '>
-            <header className="bg-gray-800 text-white py-4 px-8 flex gap-4 items-center">
-                <img src={'/logo.png'} height={80} width={80} />
-                <h1 className="text-3xl font-bold font-serif">Feed ME</h1>
-            </header>
+        <div className=' bg-background flex flex-col gap-12 relative '>
             <div className="flex justify-center top-[35%] absolute left-[40%] w-[25%]">
-                <div className=' p-8 space-y-8 shadow-md items-center  '>
+                <div className=' p-8 space-y-8 shadow-md items-center border  '>
                     <h1 className="font-bold text-xl mb-1 capitalize ">Please verify code sent to the registered email</h1>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -110,7 +107,7 @@ const VeriyAccount = () => {
                                     <FormItem>
                                         <FormLabel>Verification Code :{'  '} {'  '}{'  '}{' '}{hours}
                                             :{minutes}:{seconds} </FormLabel>
-                                        <FormControl>
+                                        <FormControl className="shadow-md">
                                             <Input placeholder="Enter the code" {...field} />
                                         </FormControl>
                                         <FormMessage />
@@ -124,6 +121,9 @@ const VeriyAccount = () => {
                     </Form>
                 </div>
             </div>
+            {/* <footer className="text-center font-bold p-5 md:p-6 bg-background border  shadow-md">
+                    © 2024 FeedMe. All rights reserved.
+            </footer> */}
         </div>
     )
 }

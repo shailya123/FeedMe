@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from "react-hook-form"
 import { useDebounceCallback } from "usehooks-ts"
 import * as z from "zod"
+import '../../../app/globals.css'
 const page = () => {
     const { toast } = useToast()
     const [username, setUsername] = useState('');
@@ -117,13 +118,9 @@ const page = () => {
         }
     }
     return (
-        <div className=' min-h-screen bg-gray-100 relative flex flex-col gap-12'>
-            <header className="bg-gray-800 text-white py-4 px-8 flex gap-4 items-center">
-                <img src={'/logo.png'} height={80} width={80} />
-                <h1 className="text-3xl font-bold font-serif">Feed ME</h1>
-            </header>
-            <div className="flex justify-center items-center">
-                <div className='w-full max-w-md p-8 space-y-12 shadow-md '>
+        <div className=' bg-background relative flex flex-col gap-12 '>
+            <div className="flex justify-center items-center ">
+                <div className='w-full max-w-md p-8 space-y-12 shadow-md border '>
                     <div className='text-left'>
                         <h1 className="font-bold text-2xl mb-3">Sign-Up</h1>
                         <Form {...form}>
@@ -144,7 +141,7 @@ const page = () => {
                                                     }}
                                                 />
                                             </FormControl>
-                                            <h1 className={`${username ? usernameMessage === uniqueUsernameMessage ? 'text-green-500' : 'text-red-500' : ''} capitalize text-xs`}>{username ? usernameMessage :  ''}</h1>
+                                            <h1 className={`${username ? usernameMessage === uniqueUsernameMessage ? 'text-green-500' : 'text-red-500' : ''} capitalize text-xs`}>{username ? usernameMessage : ''}</h1>
                                             {isLoading && (
                                                 <Loader2
                                                     className="absolute right-2 top-1/2  animate-spin h-4 w-4"
@@ -188,7 +185,7 @@ const page = () => {
                                     )}
                                 />
                                 <div className="flex items-center justify-center ">
-                                    <Button type="submit" className="shadow-md" disabled={isSubmitting} >{isSubmitting ? (<div className="flex flex-row gap-2"><h1>Please Wait</h1><Loader2 className="mr-2 h-4 w-4 animate-spin" /></div>) : ('Signup')}</Button>
+                                    <Button type="submit" className="shadow-md" disabled={isSubmitting} >{isSubmitting ? (<div className="flex flex-row gap-2"><h1>Please Wait</h1><Loader2 className="mr-2 h-4 w-4 animate-spin" /></div>) : ('Sign up')}</Button>
                                 </div>
                             </form>
                         </Form>
@@ -198,9 +195,17 @@ const page = () => {
                                 <Link href="/sign-in" className='text-blue-500 hover:text-blue-700'>Sign in</Link>
                             </p>
                         </div>
+                        {/* <Separator />
+                        <div className="space-y-0 w-full flex flex-col gap-2">
+                            <h1 className="flex items-center justify-center">Or Sign Up</h1>
+                            <Button type="submit" className="shadow-md w-full" onClick={() => signIn("google")} ><><FcGoogle size={25} />&nbsp; Google</></Button>
+                        </div> */}
                     </div>
                 </div>
             </div>
+            {/* <footer className="text-center font-bold p-5 md:p-6 bg-background border  shadow-md">
+                © 2024 FeedMe. All rights reserved.
+            </footer> */}
         </div >
     )
 }

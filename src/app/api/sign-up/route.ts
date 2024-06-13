@@ -18,8 +18,8 @@ export async function POST(req: Request, res: NextApiResponse) {
     if (existingUser) {
       return new Response(
         JSON.stringify({
-          success: true,
-          result: { message: "Username is already taken" },
+          success: false,
+          result: { message: "Email is already taken" },
           status: 400,
         })
       );
@@ -31,7 +31,7 @@ export async function POST(req: Request, res: NextApiResponse) {
         return new Response(
           JSON.stringify({
             success: false,
-            result: { message: "Email already existes" },
+            result: { message: "Email already existes, Please verify it!" },
             status: 400,
           })
         );

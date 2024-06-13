@@ -10,7 +10,8 @@ export async function POST(req: Request) {
 
   const { username, content } = await req.json();
   try {
-    const user:any = await UserModel.find({ username });
+    const user: any = await UserModel.findOne({ username });
+
     if (!user) {
         return new Response(
             JSON.stringify({
@@ -20,7 +21,7 @@ export async function POST(req: Request) {
             })
           );
         }
-    if(user.isAcceptingMessages) {
+    if(!user.isAcceptingMessages) {
        return new Response(JSON.stringify({
             success: false,
             result: { message: "User is Not Accepting Messages" },
@@ -29,7 +30,8 @@ export async function POST(req: Request) {
         );
     } 
     const newMessage={content,createdAt:new Date()} 
-    user.messages.push(newMessage as Message) 
+    user.messages.push(newMessage) 
+    console.log(user);
     await user.save()
     return new Response(JSON.stringify({
         success: true,

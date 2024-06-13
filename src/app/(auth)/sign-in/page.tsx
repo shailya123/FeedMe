@@ -9,6 +9,7 @@ import {
     FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { signInSchema } from "@/schemas/signInSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -18,9 +19,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from "react-hook-form"
+import { FcGoogle } from "react-icons/fc"
 import * as z from "zod"
+import '../../../app/globals.css'
+
 const page = () => {
-    
+
     const { toast } = useToast()
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [passwordVisibility, setPasswordVisibility] = useState(false)
@@ -72,13 +76,9 @@ const page = () => {
         }
     }
     return (
-        <div className=' min-h-screen bg-gray-100 relative flex flex-col gap-12'>
-            <header className="bg-gray-800 text-white py-4 px-8 flex gap-4 items-center">
-                <img src={'/logo.png'} height={80} width={80} />
-                <h1 className="text-3xl font-bold font-serif">Feed ME</h1>
-            </header>
+        <div className=' bg-background relative flex flex-col gap-12'>
             <div className="flex justify-center items-center">
-                <div className='w-full max-w-md p-8 space-y-12 shadow-md '>
+                <div className='w-full max-w-md p-8 space-y-8 shadow-md border'>
                     <div className='text-left'>
                         <h1 className="font-bold text-2xl mb-3">Sign-In</h1>
                         <Form {...form}>
@@ -129,8 +129,16 @@ const page = () => {
                             </p>
                         </div>
                     </div>
+                    <Separator />
+                    <div className="space-y-0 w-full flex flex-col gap-2">
+                        <h1 className="flex items-center justify-center">Or Sign In</h1>
+                        <Button type="submit" className="shadow-md w-full" onClick={() => signIn("google")} ><><FcGoogle size={25} />&nbsp; Google</></Button>
+                    </div>
                 </div>
             </div>
+            {/* <footer className="text-center font-bold p-5 md:p-6 bg-background shadow-md border">
+                © 2024 FeedMe. All rights reserved.
+            </footer> */}
         </div >
     )
 }

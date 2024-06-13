@@ -8,8 +8,8 @@ import mongoose from "mongoose";
 export async function GET(req: Request) {
   await dbConnect();
   const session = await getServerSession(authOptions);
-  const user: User = session?.user as User;
-  if (!session || !user) {
+  const OriginalUser: User = session?.user as User;
+  if (!session || !OriginalUser) {
     return new Response(
       JSON.stringify({
         success: false,
@@ -18,14 +18,21 @@ export async function GET(req: Request) {
       })
     );
   }
-  const userId = new mongoose.Types.ObjectId(user._id);
+  const userId =OriginalUser?._id!=='' && new mongoose.Types.ObjectId(OriginalUser._id);
+  console.log(userId);
   try {
     const user = await UserModel.aggregate([
-      { $match: { id: userId } },
-      { $unwind: "$messages" },
-      { $sort: { "$messages.createdAt": -1 } },
-      { $group: { _id: "$_id", messages: { $push: "$messages" } } },
-    ]);
+      { $match: { 
+        $or: [
+          {_id:userId},
+          { email: OriginalUser.email }
+        ]
+      }
+    },
+    { $unwind: '$messages' },
+    { $sort: { 'messages.createdAt': -1 } },
+    { $group: { _id: '$_id', messages: { $push: '$messages' } } },
+  ]).exec();
     if(!user||user.length===0){
         return new Response(
             JSON.stringify({
@@ -35,6 +42,7 @@ export async function GET(req: Request) {
             })
           );  
     }
+    console.log(user);
     return new Response(
         JSON.stringify({
           success: true,

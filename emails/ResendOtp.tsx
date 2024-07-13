@@ -1,4 +1,5 @@
 import {
+  Button,
   Column,
   Font,
   Head,
@@ -8,14 +9,16 @@ import {
   Preview,
   Row,
   Section,
+  Tailwind,
   Text
 } from '@react-email/components';
-interface VerificationEmailProps {
+import { Clipboard } from 'lucide-react';
+interface ResendOtpProps {
   username: string;
   otp: string;
 }
 
-export default function VerificationEmail({ username, otp }: VerificationEmailProps) {
+export default function ResendOtpEmail({ username, otp }: ResendOtpProps) {
   return (
     <Html lang="en" dir="ltr">
       <Head>
@@ -38,11 +41,11 @@ export default function VerificationEmail({ username, otp }: VerificationEmailPr
         </Row>
         <Row>
           <Text>
-            Thank you for registering. To complete your registration, please use the verification code provided below. This code will remain valid for the next hour.
+            please use the verification code provided below. This code will remain valid for the next hour.
           </Text>
         </Row>
         <Row>
-          <Column><Text style={{fontWeight:'bold'}}>Verification OTP: {otp}</Text></Column>
+          <Column><Text  style={{fontWeight:'bold'}}>Verification OTP: {otp}</Text></Column>
         </Row>
         <Row>
           <Text>

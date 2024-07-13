@@ -5,4 +5,5 @@ export const MessagesSchema = z.object({
     .string()
     .min(10, "Content must be of atleast 10 Characters")
     .max(300, "Content must be no longer than 300 Characters"),
+    rating:z.number().min(0.5,{message:'Minimum rating is 0.5'})
 });

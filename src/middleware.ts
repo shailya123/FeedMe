@@ -7,7 +7,7 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request });
   const url = request.nextUrl;
 
-  if (token && ["/sign-in", "/verify", "/sign-up", "/"].includes(url.pathname)) {
+  if (token && ["/sign-in", "/verify", "/sign-up", "/","/forgot-password"].includes(url.pathname)) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
@@ -19,5 +19,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/sign-in", "/sign-up", "/", "/dashboard/:path*", "/verify/:path*"],
+  matcher: ["/sign-in", "/sign-up", "/","/forgot-password", "/dashboard/:path*", "/verify/:path*","/profile"],
 };

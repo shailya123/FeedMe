@@ -12,8 +12,8 @@ export async function DELETE(
   const messageId = params.messageid;
   await dbConnect();
   const session = await getServerSession(authOptions);
-  const user: User = session?.user as User;
-  if (!session || !user) {
+  const _user: User = session?.user as User;
+  if (!session || !_user) {
     return new Response(
       JSON.stringify({
         success: false,
@@ -22,14 +22,12 @@ export async function DELETE(
       })
     );
   }
-  const userId = new mongoose.Types.ObjectId(user._id);
   try {
     const updateResult = await UserModel.updateOne(
-      { _id: user._id },
-      {
-        $pull: { message: { _id: messageId } },
-      }
+      { _id: _user._id },
+      { $pull: { messages: { _id: messageId } } }
     );
+    console.log(updateResult);
     if (updateResult.modifiedCount === 0) {
       return new Response(
         JSON.stringify({

@@ -1,5 +1,4 @@
 'use client';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
@@ -10,9 +9,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { MessagesSchema } from '@/schemas/messageSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCompletion } from 'ai/react';
@@ -22,7 +20,8 @@ import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import '../../../app/globals.css';
+import ReactStars from 'react-stars'
+import '../../../globals.css';
 
 const specialChar = '||';
 
@@ -36,6 +35,8 @@ const initialMessageString =
 export default function SendMessage() {
   const params = useParams<{ username: string }>();
   const username = params.username;
+  const { toast } = useToast();
+  const [selectedRating,setselectedRating]=useState(0);
 
   const {
     complete,
@@ -70,18 +71,30 @@ export default function SendMessage() {
         body: JSON.stringify({ ...data, username }),
       })
       const val = await res.json();
-      console.log(val);
-      toast({
-        title: 'Success',
-        description: val.result.message,
-        duration: 3000,
-        style: {
-          background: 'black',
-          color: 'white',
-          font: 'semi-bold'
-        },
-      })
-      form.reset({ ...form.getValues(), content: '' });
+      console.log(data);
+      if (val.success) {
+        const socket = new WebSocket('ws://localhost:9000');
+        socket.onopen = () => {
+          socket.send(JSON.stringify({ username, text: data.content, rating:data.rating }));
+        };
+        toast({
+          title: 'Success',
+          description: val.result.message,
+          duration: 3000,
+          style: {
+            background: 'black',
+            color: 'white',
+            font: 'semi-bold'
+          },
+        })
+      }
+      else {
+        toast({
+          title: 'Failure',
+          description: val.result.message,
+          variant: 'destructive'
+        })
+      }
     } catch (error) {
       toast({
         title: 'Failure',
@@ -90,6 +103,7 @@ export default function SendMessage() {
       })
     } finally {
       setIsLoading(false);
+      form.reset();
     }
   };
 
@@ -102,9 +116,12 @@ export default function SendMessage() {
     }
   };
 
+  const ratingChanged = (newRating:number) => {
+    form.setValue('rating',newRating);
+    setselectedRating(newRating)
+  }
   return (
-    <div className="container mx-auto my-8 p-6 bg-background rounded max-w-4xl">
-      {/* <Navbar/> */}
+    <div className="container p-6 bg-background rounded max-w-4xl flex-1 flex-grow">
       <h1 className="text-4xl font-bold mb-6 text-center">
         Public Profile Link
       </h1>
@@ -127,6 +144,24 @@ export default function SendMessage() {
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="rating"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Rate</FormLabel>
+                <FormControl>
+                  <ReactStars
+                    count={5}
+                    onChange={ratingChanged}
+                    size={24}
+                    color2={'#ffd700'} 
+                     />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="flex justify-center">
             {isLoading ? (
               <Button disabled>
@@ -142,7 +177,7 @@ export default function SendMessage() {
         </form>
       </Form>
 
-      <div className="space-y-4 my-8">
+      <div className="my-4">
         <div className="space-y-2">
           <Button
             onClick={fetchSuggestedMessages}
@@ -175,7 +210,7 @@ export default function SendMessage() {
           </CardContent>
         </Card>
       </div>
-      <Separator className="my-6" />
+      {/* <Separator className="my-6" /> */}
       <div className="text-center">
         <div className="mb-4">Get Your Message Board</div>
         <Link href={'/sign-up'}>

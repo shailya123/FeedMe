@@ -9,7 +9,6 @@ import {
     FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { signInSchema } from "@/schemas/signInSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -22,6 +21,7 @@ import { useForm } from "react-hook-form"
 import { FcGoogle } from "react-icons/fc"
 import * as z from "zod"
 import '../../../app/globals.css'
+import Separator from "@/components/self-ui/Separator"
 
 const page = () => {
 
@@ -46,7 +46,6 @@ const page = () => {
             identifier: data.identifier,
             password: data.password
         })
-        console.log(result);
         if (result?.error) {
             setIsSubmitting(false);
             toast({
@@ -76,9 +75,9 @@ const page = () => {
         }
     }
     return (
-        <div className=' bg-background relative flex flex-col gap-12'>
+        <div className=' bg-background flex flex-col gap-12'>
             <div className="flex justify-center items-center">
-                <div className='w-full max-w-md p-8 space-y-8 shadow-md border'>
+                <div className='w-full max-w-md p-8 space-y-4 shadow-md border rounded-xl'>
                     <div className='text-left'>
                         <h1 className="font-bold text-2xl mb-3">Sign-In</h1>
                         <Form {...form}>
@@ -91,7 +90,7 @@ const page = () => {
                                         <FormItem >
                                             <FormLabel>Email/Username</FormLabel>
                                             <FormControl className="shadow-md">
-                                                <Input placeholder="Enter Email/Username" {...field} />
+                                                <Input placeholder="example@domain.com/username" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -117,28 +116,29 @@ const page = () => {
                                         </FormItem>
                                     )}
                                 />
-                                <div className="flex items-center justify-center ">
-                                    <Button type="submit" className="shadow-md" disabled={isSubmitting} >{isSubmitting ? (<div className="flex flex-row gap-2"><h1>Please Wait</h1><Loader2 className="mr-2 h-4 w-4 animate-spin" /></div>) : ('Sign In')}</Button>
+                                <div className="flex justify-end">
+                                    <p>
+                                        <Link href="/forgot-password" className='text-blue-500 hover:text-blue-700'>Forgot Password?</Link>
+                                    </p>
+                                </div>
+                                <div className="flex  w-full ">
+                                    <Button type="submit" className="shadow-md w-full" disabled={isSubmitting} >{isSubmitting ? (<div className="flex flex-row gap-2"><h1>Please Wait</h1><Loader2 className="mr-2 h-4 w-4 animate-spin" /></div>) : ('Sign In')}</Button>
                                 </div>
                             </form>
                         </Form>
-                        <div className='text-center mt-4'>
+                        <div className='text-right text-sm mt-4'>
                             <p>
                                 New member?{' '}
                                 <Link href="/sign-up" className='text-blue-500 hover:text-blue-700'>Sign up</Link>
                             </p>
                         </div>
                     </div>
-                    <Separator />
-                    <div className="space-y-0 w-full flex flex-col gap-2">
-                        <h1 className="flex items-center justify-center">Or Sign In</h1>
-                        <Button type="submit" className="shadow-md w-full" onClick={() => signIn("google")} ><><FcGoogle size={25} />&nbsp; Google</></Button>
+                  <Separator value="Or"/>
+                    <div className="space-y-0 w-full flex flex-col">
+                        <Button type="submit" className="shadow-md w-full" onClick={() => signIn("google")} ><><FcGoogle size={25} />&nbsp;Continue with google</></Button>
                     </div>
                 </div>
             </div>
-            {/* <footer className="text-center font-bold p-5 md:p-6 bg-background shadow-md border">
-                © 2024 FeedMe. All rights reserved.
-            </footer> */}
         </div >
     )
 }

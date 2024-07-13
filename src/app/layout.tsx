@@ -1,10 +1,10 @@
+import Navbar from '@/components/self-ui/Navbar';
+import { Toaster } from '@/components/ui/toaster';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import './globals.css';
 import AuthProvider from '../context/AuthProvider';
-import { Toaster } from '@/components/ui/toaster';
+import './globals.css';
 import { ThemeProvider } from './providers/ThemeProvider';
-import Navbar from '@/components/self-ui/Navbar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -31,9 +31,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             <Navbar />
             {children}
             <Toaster />
-            <footer className="text-center font-bold p-5 md:p-6 bg-background border shadow-md">
-              © 2024 FeedMe. All rights reserved.
-            </footer>
+            {/* <Footer /> */}
           </ThemeProvider>
         </body>
       </AuthProvider>

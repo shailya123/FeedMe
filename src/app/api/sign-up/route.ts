@@ -5,8 +5,6 @@ import UserModel from "@/model/User";
 import bcrypt from "bcryptjs";
 import { NextApiResponse } from "next";
 
-export async function GET(req: Request, res: NextApiResponse) {}
-
 export async function POST(req: Request, res: NextApiResponse) {
   await dbConnect();
   try {

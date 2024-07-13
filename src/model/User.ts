@@ -3,12 +3,17 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface Message extends Document {
   content: string;
   createdAt: Date;
+  rating:number;
 }
 
 const MessageSchema: Schema<Message> = new Schema({
   content: {
     type: String,
     required: true,
+  },
+  rating:{
+    type:Number,
+    required:true,
   },
   createdAt: {
     type: Date,
@@ -25,6 +30,17 @@ export interface User extends Document {
   verifyCodeExpiry: Date; // Corrected typo here
   isVerified: boolean;
   isAcceptingMessages: boolean; // Corrected typo here
+  resetPasswordToken:string;
+  resetPasswordExpires:Date;
+  profileImg:string;
+  pincode:string;
+  address:string;
+  contactNumber:string;
+  gender:string;
+  state?:string;
+  country?:string;
+  city?:string;
+  birthdate:Date;
   messages: Message[];
 }
 
@@ -64,6 +80,49 @@ const UserSchema: Schema<User> = new Schema({
   isAcceptingMessages: {
     type: Boolean,
     default: true,
+  },
+  resetPasswordToken: {
+    type: String,
+    default: '',
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: Date.now,
+  },
+  gender: {
+    type: String,
+    default: '',
+  },
+  profileImg: {
+    type: String,
+    default: '',
+  },
+  pincode: {
+    type: String,
+    default: '',
+  },
+  address: {
+    type: String,
+    default: '',
+  },
+  contactNumber: {
+    type: String,
+    default: '',
+  },
+  state: {
+    type: String,
+    default: '',
+  },
+  country: {
+    type: String,
+    default: '',
+  },
+  city:{
+    type: String,
+    default: '', 
+  },
+  birthdate:{
+    type: Date,
   },
   messages: [MessageSchema],
 });

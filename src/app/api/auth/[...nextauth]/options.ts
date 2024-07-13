@@ -1,8 +1,7 @@
-import { NextAuthOptions } from "next-auth";
+import { dbConnect } from "@/lib/dbConnect";
+import UserModel from "@/model/User";
 import bcrypt from "bcryptjs";
-// import credentials from "next-auth/providers/credentials";
-import UserModel from "../../../../model/User";
-import { dbConnect } from "../../../../lib/dbConnect";
+import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -51,10 +50,10 @@ export const authOptions: NextAuthOptions = {
         params: {
           prompt: "consent",
           access_type: "offline",
-          response_type: "code"
-        }
-      }
-    })
+          response_type: "code",
+        },
+      },
+    }),
   ],
   pages: {
     signIn: "/sign-in",
@@ -83,26 +82,28 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async signIn({ user, account, profile }) {
-      if (account && account.provider === "google") {
-        if (profile && profile.email && !profile?.email.endsWith("@alloweddomain.com")) {
+      if (account && account?.provider === "google") {
+        await dbConnect();
+        try {
+          const existingUser =
+            profile &&
+            profile.email &&
+            (await UserModel.findOne({ email: profile?.email }));
+            if (existingUser) {
+            user.name=existingUser?.username;
+            user.username=existingUser?.username;
+            user.isVerified=existingUser?.isVerified;
+            user._id=existingUser?._id;
+            user.image=existingUser?.profileImg??user.image
+            return true;
+          }
+          return false;
+        } catch (err) {
+          console.error(err);
           return false;
         }
       }
       return true;
-    },
-  },
-  events: {
-    async createUser(message) {
-      const { user } = message;
-      // Custom logic for new user creation
-      // For example, you might want to initialize some user-specific data in your database
-      await UserModel.create({
-        where: { id: user.id },
-        data: {
-          // Add any additional fields you want to initialize
-          profileCompleted: false, // Example field
-        },
-      });
     },
   },
 };

@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
 import { signupSchema } from '@/schemas/signUpSchema'
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, Loader2, User, User2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -50,7 +50,6 @@ const page = () => {
                     const res = await fetch(`/api/check-username-unique?username=${username}`)
                     const data = await res.json();
                     setUsernameMessage(data.result.message)
-                    console.log(data)
                     setIsLoading(false);
                 } catch (err) {
                     console.log("error while fetching unique username", err);
@@ -103,7 +102,9 @@ const page = () => {
                         font: 'semi-bold'
                     },
                 })
+                form.reset();
                 setIsSubmitting(false)
+                setUsernameMessage('');
             }
         }
         catch (err) {
@@ -118,9 +119,9 @@ const page = () => {
         }
     }
     return (
-        <div className=' bg-background relative flex flex-col gap-12 '>
+        <div className=' bg-background flex flex-col gap-12 '>
             <div className="flex justify-center items-center ">
-                <div className='w-full max-w-md p-8 space-y-12 shadow-md border '>
+                <div className='w-full max-w-md p-8 space-y-4 shadow-md border rounded-xl '>
                     <div className='text-left'>
                         <h1 className="font-bold text-2xl mb-3">Sign-Up</h1>
                         <Form {...form}>
@@ -131,7 +132,7 @@ const page = () => {
                                     render={({ field }) => (
                                         <FormItem className="relative">
                                             <FormLabel>Username</FormLabel>
-                                            <FormControl className="shadow-md">
+                                            <FormControl className="shadow-md flex items-center">
                                                 <Input
                                                     placeholder="Enter username"
                                                     {...field}
@@ -158,7 +159,7 @@ const page = () => {
                                         <FormItem >
                                             <FormLabel>Email</FormLabel>
                                             <FormControl className="shadow-md">
-                                                <Input placeholder="Enter Email" {...field} />
+                                                <Input placeholder="example@domain.com" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -185,27 +186,19 @@ const page = () => {
                                     )}
                                 />
                                 <div className="flex items-center justify-center ">
-                                    <Button type="submit" className="shadow-md" disabled={isSubmitting} >{isSubmitting ? (<div className="flex flex-row gap-2"><h1>Please Wait</h1><Loader2 className="mr-2 h-4 w-4 animate-spin" /></div>) : ('Sign up')}</Button>
+                                    <Button type="submit" className="shadow-md w-full" disabled={isSubmitting} >{isSubmitting ? (<div className="flex flex-row gap-2"><h1>Please Wait</h1><Loader2 className="mr-2 h-4 w-4 animate-spin" /></div>) : ('Sign up')}</Button>
                                 </div>
                             </form>
                         </Form>
-                        <div className='text-center mt-4'>
+                        <div className='text-right text-sm mt-4'>
                             <p>
                                 Already a member?{' '}
                                 <Link href="/sign-in" className='text-blue-500 hover:text-blue-700'>Sign in</Link>
                             </p>
                         </div>
-                        {/* <Separator />
-                        <div className="space-y-0 w-full flex flex-col gap-2">
-                            <h1 className="flex items-center justify-center">Or Sign Up</h1>
-                            <Button type="submit" className="shadow-md w-full" onClick={() => signIn("google")} ><><FcGoogle size={25} />&nbsp; Google</></Button>
-                        </div> */}
                     </div>
                 </div>
             </div>
-            {/* <footer className="text-center font-bold p-5 md:p-6 bg-background border  shadow-md">
-                © 2024 FeedMe. All rights reserved.
-            </footer> */}
         </div >
     )
 }

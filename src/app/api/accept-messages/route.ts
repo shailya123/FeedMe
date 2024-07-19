@@ -8,6 +8,7 @@ export async function POST(req: Request) {
   await dbConnect();
   const session = await getServerSession(authOptions);
   const user: User = session?.user as User;
+  console.log("acceppt-message",user)
   if (!session || !user) {
     return new Response(
       JSON.stringify({

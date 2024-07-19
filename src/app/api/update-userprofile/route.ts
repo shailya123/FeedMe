@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   try {
     console.log(data,email);
     const user: any = await UserModel.findOneAndUpdate( { "email" : email },
-        { $set : data },);
+        { $set : data })
     if (!user) {
         return new Response(
             JSON.stringify({

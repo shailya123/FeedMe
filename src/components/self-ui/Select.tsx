@@ -14,13 +14,13 @@ type props={
     items:string[],
     type:string,
     onChange:(value:string)=>void,
-    defaultValue:string
+    value?:string
 }
-  export default function Selectdemo({items,type,onChange,defaultValue}:props) {
+  export default function Selectdemo({items,type,onChange,value}:props) {
     return (
       <Select onValueChange={(e)=>onChange(e)}>
         <SelectTrigger >
-          <SelectValue placeholder={defaultValue??`Select a ${type}`} defaultValue={defaultValue} defaultChecked />
+          <SelectValue placeholder={value??`Select a ${type}`} defaultValue={value} defaultChecked />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>

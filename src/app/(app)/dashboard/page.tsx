@@ -9,7 +9,7 @@ import { Message } from '@/model/User';
 import { acceptMessagesSchema } from '@/schemas/acceptMessageSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Separator } from '@radix-ui/react-separator';
-import { Download, Loader, RefreshCcw } from 'lucide-react';
+import { Download, Loader, RefreshCcw, Smile } from 'lucide-react';
 import { User } from 'next-auth';
 import { useSession } from 'next-auth/react';
 import qrcode from 'qrcode';
@@ -17,6 +17,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import '../../globals.css';
 import RatingComponent from '@/components/self-ui/Rating';
+import IntegrateSlackButton from '@/components/self-ui/IntegrateSlackButton';
+import SlackDashboard from '@/components/self-ui/SlackChannel';
 
 const Page = () => {
   const { toast } = useToast();
@@ -34,19 +36,19 @@ const Page = () => {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [acceptMessages, setAcceptMessages] = useState(false); // Example initial state, adjust as needed
   const [averageUserRating, setAverageUserRating] = useState(0);
-  const [ratingsDistribution, setRatingsDistribution] = useState({});
+  const [ratingsDistribution, setRatingsDistribution] = useState({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 });
+  const [isSlackIntegrated, setIsSlackIntegrated] = useState(false);
 
   const calculateAverageRating = useCallback((messageArray: Message[]) => {
-    if (!messageArray || messageArray?.length === 0) return [];
+    if (!messageArray || messageArray?.length === 0) return 0;
     const totalRating = messageArray?.reduce((acc, curr) => acc + curr.rating, 0);
-    return (totalRating / messageArray?.length);
+    return (totalRating / messageArray?.length) ?? 0;
   }, [setMessages])
 
   const calculateRatingsDistribution = useCallback((messages: Message[]) => {
     return messages?.reduce((acc: any, message: Message) => {
-      console.log(Math.floor(message.rating))
       acc[Math.floor(message?.rating)] = (acc[Math.floor(message?.rating)] || 0) + 1;
-      return acc;
+      return acc ?? { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     }, { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 });
   }, [setMessages]);
 
@@ -56,6 +58,7 @@ const Page = () => {
       const res = await fetch('/api/accept-messages');
       const data = await res.json();
       setValue('acceptMessages', data.isAcceptingMessages);
+      setAcceptMessages(data.isAcceptingMessages);
     } catch (err) {
       console.error('Error fetching accept messages:', err);
       toast({
@@ -74,10 +77,9 @@ const Page = () => {
     try {
       const res = await fetch('/api/get-messages');
       const data = await res.json();
-      setMessages(data.result.messages || []);
-      console.log(data.result.messages)
-      if (data) {
-        setAverageUserRating(calculateAverageRating(data?.result?.messages).toFixed(2));
+      if (data.success) {
+        setMessages(data.result.messages || []);
+        setAverageUserRating(Number(calculateAverageRating(data?.result?.messages).toFixed(2)));
         setRatingsDistribution(calculateRatingsDistribution(data?.result?.messages))
       }
       if (refresh) {
@@ -141,7 +143,6 @@ const Page = () => {
   }
 
   const handleNewMessage = useCallback((message: any) => {
-    console.log("message", message);
     if (message?.type !== 'greeting') {
       setNotifications((prev) => [...prev, message]);
       toast({
@@ -162,6 +163,10 @@ const Page = () => {
   useEffect(() => {
     if (!session || !session.user) return;
     fetchAcceptMessage();
+    console.log(session?.user);
+    if (session?.user?.slackAccessToken) {
+      setIsSlackIntegrated(true);
+    }
   }, [session]);
 
   useEffect(() => {
@@ -223,12 +228,25 @@ const Page = () => {
   };
 
   const handleDeleteMessage = (messageId: string) => {
-    setMessages(messages.filter((message) => message._id !== messageId))
+    const newMessageArray = messages.filter((message) => message._id !== messageId)
+    setMessages(newMessageArray);
+    if (newMessageArray.length > 0) {
+      // console.log("called");
+      setAverageUserRating(Number(calculateAverageRating(newMessageArray || [])?.toFixed(2)));
+      setRatingsDistribution(calculateRatingsDistribution(newMessageArray || []));
+    }
+    else {
+      setAverageUserRating(calculateAverageRating([]));
+      setRatingsDistribution(calculateRatingsDistribution([]));
+    }
   }
 
   return (
-    <div className="my-8 md:mx-8 lg:mx-auto p-6 bg-background rounded w-full flex-grow flex-1">
-      <h1 className="text-4xl font-bold mb-4 capitalize">{username} Dashboard</h1>
+    <div className="my-8 md:mx-8 lg:mx-auto p-6 bg-background text-foreground rounded w-full flex-grow flex-1">
+      {!isSlackIntegrated ? <IntegrateSlackButton /> :
+        <SlackDashboard />
+      }
+      <h1 className="text-4xl font-bold mb-4 capitalize">User Dashboard</h1>
       <div className="mb-4">
         <h2 className="text-lg font-semibold mb-2">Get Your Unique Link</h2>{' '}
         <div className="flex items-center gap-2">
@@ -238,13 +256,13 @@ const Page = () => {
             disabled
             className="input input-bordered w-[25%] p-2 rounded-lg"
           />
-          <Button onClick={copyToClipboard}>Copy</Button>
+          <Button onClick={copyToClipboard} className='bg-green-500'>Copy</Button>
           <div className="flex gap-2 items-center">
             <h1>Or</h1>
             <img src={qrUrl} alt="QR Code" />
             <div className="flex gap-2 items-center cursor-pointer">
-              <Button onClick={shareImage}>Share</Button>
-              <Download onClick={downloadImage} />
+              <Button onClick={shareImage} className='bg-green-500'>Share</Button>
+              <Download onClick={downloadImage} className='text-green-500' />
             </div>
           </div>
           <div className='flex-1 justify-end items-end flex pr-6'>
@@ -269,8 +287,7 @@ const Page = () => {
       )}
       <Separator />
       <Button
-        className="mt-4"
-        variant="outline"
+        className="mt-4 bg-green-500 text-foreground"
         onClick={(e) => {
           e.preventDefault();
           fetchMessages(true);
@@ -284,7 +301,7 @@ const Page = () => {
         Refresh Messages
       </Button>
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {messages.length > 0 ? (
+        {messages.length > 0 && (
           messages.map((message, index) => (
             <MessageCard
               key={message._id}
@@ -292,10 +309,9 @@ const Page = () => {
               onMessageDelete={handleDeleteMessage}
             />
           ))
-        ) : (
-          <p>No messages to display.</p>
         )}
       </div>
+      {messages.length === 0 && <div className='flex justify-center items-center text-2xl'><Smile className='text-green-500' />&nbsp;<p>No Message to display</p></div>}
     </div>
   );
 };

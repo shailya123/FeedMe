@@ -69,6 +69,8 @@ export const authOptions: NextAuthOptions = {
         token.isVerified = user.isVerified;
         token.isAcceptingMessages = user.isAcceptingMessages;
         token.username = user.username;
+        token.slackAccessToken=user.slackAccessToken;
+        token.slackTeam=user.slackTeam;
       }
       return token;
     },
@@ -78,6 +80,8 @@ export const authOptions: NextAuthOptions = {
         session.user.isVerified = token.isVerified ?? false;
         session.user.isAcceptingMessages = token.isAcceptingMessages ?? false;
         session.user.username = token.username ?? "";
+        session.user.slackAccessToken=token.slackAccessToken;
+        session.user.slackTeam=token.slackTeam;
       }
       return session;
     },
@@ -95,6 +99,8 @@ export const authOptions: NextAuthOptions = {
             user.isVerified=existingUser?.isVerified;
             user._id=existingUser?._id;
             user.image=existingUser?.profileImg??user.image
+            user.slackAccessToken=existingUser?.slackAccessToken;
+            user.slackTeam=existingUser?.slackTeam;
             return true;
           }
           return false;

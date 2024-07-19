@@ -41,7 +41,12 @@ export interface User extends Document {
   country?:string;
   city?:string;
   birthdate:Date;
+  bio:string;
+  type:string;
+  slackTeam?:{id:string,name:string};
+  slackAccessToken?:string;
   messages: Message[];
+  social: mongoose.Types.ObjectId[];
 }
 
 const UserSchema: Schema<User> = new Schema({
@@ -124,6 +129,26 @@ const UserSchema: Schema<User> = new Schema({
   birthdate:{
     type: Date,
   },
+  bio:{
+    type: String,
+    default: '', 
+  },
+  type:{
+    type: String,
+    default: '', 
+  },
+  slackTeam:{
+    type:Object,
+    default:{}
+  },
+  slackAccessToken:{
+    type: String,
+    default: '',
+  },
+  social: [{
+    type: mongoose.Types.ObjectId,
+    ref: 'SocialProfile',
+  }],
   messages: [MessageSchema],
 });
 

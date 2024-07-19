@@ -7,6 +7,8 @@ declare module "next-auth" {
     isVerified?: boolean;
     isAcceptingMessages?: boolean;
     username?: string;
+    slackAccessToken?:string,
+    slackTeam?:{id:string,name:string}
   }
   interface Session {
     user: {
@@ -14,6 +16,8 @@ declare module "next-auth" {
       isVerified?: boolean;
       isAcceptingMessages?: boolean;
       username?: string;
+      slackAccessToken?:string,
+      slackTeam?:{id:string,name:string}
     } & DefaultSession["user"];
   }
   interface JWT {
@@ -22,6 +26,8 @@ declare module "next-auth" {
       isVerified?: boolean;
       isAcceptingMessages?: boolean;
       username?: string;
+      slackAccessToken?:string,
+      slackTeam?:{id:string,name:string}
     } & DefaultSession["user"];
   }
 }

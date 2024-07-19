@@ -44,9 +44,9 @@ const Navbar = () => {
             <div className="flex gap-4 justify-center items-center">
               {!user?.username && <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon">
-                    <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                    <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <Button variant="outline" size="icon" >
+                    <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-green-500" />
+                    <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-green-500" />
                     <span className="sr-only">Toggle theme</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -64,7 +64,7 @@ const Navbar = () => {
               </DropdownMenu>}
               {user?.username ? (
                 <div>
-                  <MenuBar icon={<Menu />} user={user} />
+                  <MenuBar icon={<Menu className='text-green-500' />} user={user} />
                 </div>
               ) : ((pathname === '/sign-in' || pathname === '/sign-up') ? (
                 <Button className='w-full md:w-auto text-background' onClick={() => router.push('/')}>Move to home {'->'}</Button>

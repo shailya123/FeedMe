@@ -19,4 +19,6 @@ export const profileEditSchema = z.object({
   country:z.string(),
   city:z.string(),
   birthdate:z.date(),
+  bio:z.string().min(200,{message:'Minimum 200 character are allowed'}),
+  type:z.string(),
 });

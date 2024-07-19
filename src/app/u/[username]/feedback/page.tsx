@@ -14,13 +14,13 @@ import { useToast } from '@/components/ui/use-toast';
 import { MessagesSchema } from '@/schemas/messageSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCompletion } from 'ai/react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Star, StarHalf } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import ReactStars from 'react-stars'
+import ReactStars from 'react-rating-stars-component'
 import '../../../globals.css';
 
 const specialChar = '||';
@@ -36,7 +36,7 @@ export default function SendMessage() {
   const params = useParams<{ username: string }>();
   const username = params.username;
   const { toast } = useToast();
-  const [selectedRating,setselectedRating]=useState(0);
+  const [selectedRating, setselectedRating] = useState(0);
 
   const {
     complete,
@@ -50,6 +50,10 @@ export default function SendMessage() {
 
   const form = useForm<z.infer<typeof MessagesSchema>>({
     resolver: zodResolver(MessagesSchema),
+    defaultValues: {
+      content: '',
+      rating: 0
+    }
   });
 
   const messageContent = form.watch('content');
@@ -71,11 +75,10 @@ export default function SendMessage() {
         body: JSON.stringify({ ...data, username }),
       })
       const val = await res.json();
-      console.log(data);
       if (val.success) {
         const socket = new WebSocket('ws://localhost:9000');
         socket.onopen = () => {
-          socket.send(JSON.stringify({ username, text: data.content, rating:data.rating }));
+          socket.send(JSON.stringify({ username, text: data.content, rating: data.rating }));
         };
         toast({
           title: 'Success',
@@ -103,7 +106,8 @@ export default function SendMessage() {
       })
     } finally {
       setIsLoading(false);
-      form.reset();
+      form.reset({ content: '', rating: 0 });
+      console.log(form.getValues());
     }
   };
 
@@ -116,79 +120,90 @@ export default function SendMessage() {
     }
   };
 
-  const ratingChanged = (newRating:number) => {
-    form.setValue('rating',newRating);
+  const ratingChanged = (newRating: number) => {
+    form.setValue('rating', newRating);
     setselectedRating(newRating)
   }
   return (
-    <div className="container p-6 bg-background rounded max-w-4xl flex-1 flex-grow">
+    <div className=" p-6 bg-background text-foreground flex flex-col items-center gap-5">
       <h1 className="text-4xl font-bold mb-6 text-center">
         Public Profile Link
       </h1>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="content"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Send Anonymous Message to @{username}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Write your anonymous message here"
-                    className="resize-none"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="rating"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Rate</FormLabel>
-                <FormControl>
-                  <ReactStars
-                    count={5}
-                    onChange={ratingChanged}
-                    size={24}
-                    color2={'#ffd700'} 
-                     />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="flex justify-center">
-            {isLoading ? (
-              <Button disabled>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Please wait
-              </Button>
-            ) : (
-              <Button type="submit" disabled={isLoading || !messageContent}>
-                Send It
-              </Button>
-            )}
-          </div>
-        </form>
-      </Form>
-
-      <div className="my-4">
+      <div className="text-right w-full max-w-5xl">
+        <div className="mb-4">Get Your Message Board</div>
+        <Link href={'/sign-up'}>
+          <Button className="bg-green-500 text-foreground">Create Your Account</Button>
+        </Link>
+      </div>
+      <div className="my-4 w-full max-w-5xl">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="content"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Send Anonymous Message to @{username}</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Write your anonymous message here"
+                      className="resize-none"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="rating"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Rate</FormLabel>
+                  <FormControl>
+                    <ReactStars
+                      count={5}
+                      size={36}
+                      isHalf={true}
+                      onChange={ratingChanged}
+                      emptyIcon={<Star />}
+                      halfIcon={<StarHalf />}
+                      fullIcon={<Star />}
+                      activeColor="#ffd700"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex justify-center">
+              {isLoading ? (
+                <Button disabled>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Please wait
+                </Button>
+              ) : (
+                <Button type="submit" className='bg-green-500 text-foreground' disabled={isLoading || !messageContent}>
+                  Send It
+                </Button>
+              )}
+            </div>
+          </form>
+        </Form>
+      </div>
+      <div className="my-4 w-full max-w-5xl">
         <div className="space-y-2">
           <Button
             onClick={fetchSuggestedMessages}
-            className="my-4"
+            className="my-4 bg-green-500 text-foreground"
             disabled={isSuggestLoading}
           >
             Suggest Messages
           </Button>
           <p>Click on any message below to select it.</p>
         </div>
-        <Card>
+        <Card className="bg-gray-800 text-foreground">
           <CardHeader>
             <h3 className="text-xl font-semibold">Messages</h3>
           </CardHeader>
@@ -209,13 +224,6 @@ export default function SendMessage() {
             )}
           </CardContent>
         </Card>
-      </div>
-      {/* <Separator className="my-6" /> */}
-      <div className="text-center">
-        <div className="mb-4">Get Your Message Board</div>
-        <Link href={'/sign-up'}>
-          <Button>Create Your Account</Button>
-        </Link>
       </div>
     </div>
   );

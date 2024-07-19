@@ -4,7 +4,12 @@ import { useAuth } from '@/context/UserContext';
 import { User } from '@/model/User';
 import { Edit } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { FaLinkedinIn } from "react-icons/fa";
+import { FaInstagram } from "react-icons/fa";
 import '../../../globals.css'
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+
 const Profile = () => {
     const { user } = useAuth();
     const userImage = user?.image?.toString();
@@ -18,8 +23,6 @@ const Profile = () => {
                     const data = await res.json();
                     if (data.success)
                         setUserData(data.result.data);
-                    console.log(userData);
-
                 } catch (err) {
                     console.log("error while fetching unique username", err);
                 }
@@ -29,45 +32,42 @@ const Profile = () => {
     }, [user])
 
     return (
-        <div className="p-6 flex flex-col gap-5 flex-grow ">
-            <div className='flex justify-end items-end'>
-                <ProfileDialog user={user} userData={userData}>
-                    <Edit />
-                </ProfileDialog>
-            </div>
-            <div className='flex justify-around  flex-1 items-start'>
-                <div className="flex flex-col gap-1 items-center">
-                    <img src={userData?.profileImg || 'https://images.unsplash.com/photo-1542065435-d6bc2eac3377?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGF2YXRhcnN8ZW58MHx8MHx8fDA%3D'}
-                        className="w-36 h-36 rounded-full object-cover" />
-                    <h1 className="text-2xl font-semibold mt-4">{user?.name || user?.username}</h1>
-                    <div className="flex flex-col items-center mt-2">
-                        <div className="ml-2 flex">
-                            {[...Array(5)].map((_, i) => (
-                                <svg key={i} className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 .587l3.668 7.568 8.332 1.151-6.063 5.845 1.421 8.257L12 18.896 4.642 23.408l1.421-8.257-6.063-5.845 8.332-1.151z" />
-                                </svg>
-                            ))}
+        <div className="p-10 text-foreground max-w-6xl flex justify-center items-center">
+            <div>
+                <Link href={'/dashboard'}><Button className="text-green-500 text-lg" variant='link' size='icon'>&lt; Back</Button></Link>
+                <div className="flex flex-col md:flex-row items-center md:items-start justify-between mt-8">
+                    <div className="flex flex-col items-center md:items-start">
+                        <h1 className="text-5xl font-bold mb-2 capitalize">{user?.username}</h1>
+                        <h2 className="text-2xl text-gray-400 mb-4">CEO @ Sendlane</h2>
+                        <div className="flex space-x-4 mb-4">
+                            <Link href="#" className="text-green-500 text-xl"><FaInstagram /></Link>
+                            <Link href="#" className="text-green-500 text-xl"><FaLinkedinIn /></Link>
                         </div>
-                        <p className="text-gray-600">5</p>
                     </div>
+                    <img
+                        src={
+                            userData?.profileImg ||
+                            'https://images.unsplash.com/photo-1542065435-d6bc2eac3377?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGF2YXRhcnN8ZW58MHx8MHx8fDA%3D'
+                        }
+                        className="w-48 h-48 rounded-full object-cover shadow-lg"
+                        alt="Profile Image"
+                    />
                 </div>
-                <div>
-                    <div className="w-full mt-4">
-                        <h2 className="text-lg font-semibold">Contact Information</h2>
-                        <p>Phone: {userData.contactNumber}</p>
-                        <p>Address: {userData.address}</p>
-                        <p>Email: {user?.email}</p>
-                        <p>Website: www.jeremyrose.com</p>
-                    </div>
-                    <div className="w-full mt-4">
-                        <h2 className="text-lg font-semibold">Basic Information</h2>
-                        <p>Birthday: June 3, 1992</p>
-                        <p>Gender: {userData.gender}</p>
-                    </div>
+                <p className="mt-8 text-lg leading-relaxed text-gray-300">
+                    Jimmy is a former eCommerce retailer and email marketer turned SaaS founder. Located in sunny San Diego,
+                    Jimmy loves helping businesses grow and scale through effective email marketing strategies.
+                </p>
+                <div className="mt-8">
+                    <ProfileDialog user={user} userData={userData}>
+                        <Button className="flex items-center space-x-2 bg-green-500 text-foreground px-4 py-2 rounded-md">
+                            <Edit className="w-5 h-5" />
+                            <span>Edit Profile</span>
+                        </Button>
+                    </ProfileDialog>
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default Profile

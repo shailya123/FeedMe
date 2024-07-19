@@ -28,6 +28,8 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Selectdemo from "./Select";
+import dayjs from "dayjs";
+import { Textarea } from "../ui/textarea";
 
 type Props = {
   children: React.ReactNode;
@@ -39,26 +41,27 @@ const ProfileDialog = ({ children, user, userData }: Props) => {
   const router = useRouter();
   const imageFormats = ['image/jpeg', 'image/jpg', 'image/png'];
   const items = ['Male', 'Female', 'Others'];
+  const type=['Student','Professiobal','Educator','Hobbiest','Other']
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const userImage=userData?.profileImg;
+  const userImage = userData?.profileImg;
 
- 
+
   const form = useForm<z.infer<typeof profileEditSchema>>({
-      resolver: zodResolver(profileEditSchema),
-      defaultValues:{
-      contactNumber:userData.contactNumber,
-      profileImg:userData.profileImg,
-      state:userData.state,
-      city:userData.city,
-      country:userData.country,
-      address:userData.address,
-      birthdate:userData.birthdate
-      }
-    });
-
+    resolver: zodResolver(profileEditSchema),
+    defaultValues: {
+      contactNumber: userData.contactNumber,
+      profileImg: userData.profileImg,
+      state: userData.state,
+      city: userData.city,
+      country: userData.country,
+      address: userData.address,
+      birthdate: userData.birthdate,
+      bio:userData?.bio??'',
+      type:userData?.type??'',
+    }
+  });
   const onSubmit = async (data: z.infer<typeof profileEditSchema>) => {
-    console.log(data);
     try {
       setIsSubmitting(true);
       const res = await fetch(`/api/update-userprofile`, {
@@ -69,7 +72,7 @@ const ProfileDialog = ({ children, user, userData }: Props) => {
         body: JSON.stringify({ data, email: user?.email }),
       });
       const val = await res.json();
-
+      console.log(val);
       if (val.success) {
         toast({
           title: 'Success',
@@ -81,8 +84,7 @@ const ProfileDialog = ({ children, user, userData }: Props) => {
             font: 'semi-bold'
           },
         });
-        setIsSubmitting(false);
-        form.reset();
+
       } else {
         toast({
           title: 'Failure',
@@ -94,8 +96,6 @@ const ProfileDialog = ({ children, user, userData }: Props) => {
             font: 'semi-bold'
           },
         });
-        setIsSubmitting(false);
-        form.reset();
       }
     } catch (err) {
       console.error("Error while submitting profile", err);
@@ -104,7 +104,11 @@ const ProfileDialog = ({ children, user, userData }: Props) => {
         description: 'An error occurred while updating your profile.',
         variant: 'destructive'
       });
+
+    }
+    finally {
       setIsSubmitting(false);
+      form.reset();
     }
   };
 
@@ -169,7 +173,7 @@ const ProfileDialog = ({ children, user, userData }: Props) => {
                 <FormItem>
                   <FormControl>
                     <div className="flex gap-2 items-center relative h-36 w-36">
-                      <img className="rounded-full h-36 w-36" src={userImage??field.value} alt="Profile" />
+                      <img className="h-36 w-36 rounded-full object-cover shadow-lg" src={userImage ?? field.value} alt="Profile" />
                       <input
                         type="file"
                         id="profile-image"
@@ -193,7 +197,7 @@ const ProfileDialog = ({ children, user, userData }: Props) => {
                   <FormItem>
                     <FormLabel>Address</FormLabel>
                     <FormControl className="shadow-md">
-                      <Input placeholder="example: abc, street 1" {...field} defaultValue={userData.address} />
+                      <Input placeholder="example: abc, street 1" {...field} value={userData.address} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -206,7 +210,7 @@ const ProfileDialog = ({ children, user, userData }: Props) => {
                   <FormItem>
                     <FormLabel>Contact Number</FormLabel>
                     <FormControl className="shadow-md">
-                      <Input placeholder="example: 1234567891" {...field} defaultValue={userData.contactNumber} />
+                      <Input placeholder="example: 1234567891" {...field} value={userData.contactNumber} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -221,7 +225,7 @@ const ProfileDialog = ({ children, user, userData }: Props) => {
                   <FormItem>
                     <FormLabel>Gender</FormLabel>
                     <FormControl className="shadow-md">
-                      <Selectdemo items={items} type={'gender'} onChange={field.onChange}  defaultValue={userData.gender}/>
+                      <Selectdemo items={items} type={'gender'} onChange={field.onChange} value={userData.gender} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -234,7 +238,7 @@ const ProfileDialog = ({ children, user, userData }: Props) => {
                   <FormItem>
                     <FormLabel>Pincode</FormLabel>
                     <FormControl className="shadow-md">
-                      <Input placeholder="example: 123456" {...field} onBlur={handleStateAndCountry} defaultValue={userData.pincode} />
+                      <Input placeholder="example: 123456" {...field} onBlur={handleStateAndCountry} value={userData.pincode} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -249,7 +253,7 @@ const ProfileDialog = ({ children, user, userData }: Props) => {
                   <FormItem>
                     <FormLabel>City</FormLabel>
                     <FormControl className="shadow-md">
-                      <Input placeholder="Enter the city" {...field}  defaultValue={userData.city}/>
+                      <Input placeholder="Enter the city" {...field} value={userData.city} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -262,7 +266,7 @@ const ProfileDialog = ({ children, user, userData }: Props) => {
                   <FormItem>
                     <FormLabel>State</FormLabel>
                     <FormControl className="shadow-md">
-                      <Input placeholder="Enter the state" {...field} defaultValue={userData.state}/>
+                      <Input placeholder="Enter the state" {...field} value={userData.state} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -270,33 +274,63 @@ const ProfileDialog = ({ children, user, userData }: Props) => {
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Country</FormLabel>
+                    <FormControl className="shadow-md">
+                      <Input placeholder="Enter the country" {...field} value={userData.country} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="birthdate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Birthdate</FormLabel>
+                    <FormControl className="shadow-md">
+                      <Input placeholder="select your date" type="date" {...field} defaultChecked={true} value={dayjs(userData.birthdate).format('YYYY-MM-DD')} max={dayjs(Date.now()).format('YYYY-MM-DD')} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type</FormLabel>
+                    <FormControl className="shadow-md">
+                      <Selectdemo items={type} type={'type'} onChange={field.onChange} value={userData?.type} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             <FormField
               control={form.control}
-              name="country"
+              name="bio"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <FormControl className="shadow-md">
-                    <Input placeholder="Enter the country" {...field} defaultValue={userData.country}/>
+                  <FormLabel>Bio</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Write about yourself here"
+                      className="resize-none"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-             <FormField
-              control={form.control}
-              name="birthdate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Birthdate</FormLabel>
-                  <FormControl className="shadow-md">
-                    <Input placeholder="select your date" type="date" {...field} defaultValue={userData.birthdate} max={Date.now()}/>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            </div>
 
             <DialogFooter>
               <Button type="submit" onClick={() => onSubmit(form.getValues())} className="shadow-md" disabled={isSubmitting} >{isSubmitting ? (<div className="flex flex-row gap-2"><h1>Please Wait</h1><Loader2 className="mr-2 h-4 w-4 animate-spin" /></div>) : ('Save Changes')}</Button>

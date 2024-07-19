@@ -1,10 +1,7 @@
-import { WebClient } from "@slack/web-api";
-import { NextRequest, NextResponse } from "next/server";
-import { User } from "next-auth";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/options";
 import { dbConnect } from "@/lib/dbConnect";
 import UserModel from "@/model/User";
+import { WebClient } from "@slack/web-api";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, res: NextRequest) {
   await dbConnect();

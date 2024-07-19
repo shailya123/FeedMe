@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { WebClient } from "@slack/web-api";
 
-const token = process.env.SLACK_BOT_OAUTH_TOKEN; // Use the actual token
+const token = process.env.SLACK_BOT_OAUTH_TOKEN; 
 const slackClient = new WebClient(token);
 
 export async function GET(req: NextRequest) {

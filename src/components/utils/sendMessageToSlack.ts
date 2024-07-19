@@ -8,7 +8,6 @@ export async function sendMessage(channelId: string, message: string) {
       body: JSON.stringify({ channelId, message }),
     });
     const data = await response.json();
-    console.log(data);
     if (data.result?.ok) {
       return data;
     } else {

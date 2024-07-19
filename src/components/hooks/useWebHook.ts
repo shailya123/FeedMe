@@ -12,11 +12,7 @@ const useWebSocket = (onMessage: MessageHandler, username?: string) => {
   useEffect(() => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
       socketRef.current = new WebSocket('ws://localhost:9000');
-
-      // socketRef.current.onopen = () => {
-      //   socketRef.current?.send(JSON.stringify({ type: '', username }));
-      // };
-
+      
       socketRef.current.onmessage = (event: MessageEvent) => {
         if (typeof event.data === 'string') {
           try {

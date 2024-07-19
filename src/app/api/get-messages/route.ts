@@ -19,7 +19,6 @@ export async function GET(req: Request) {
     );
   }
   const userId =OriginalUser?._id!=='' && new mongoose.Types.ObjectId(OriginalUser._id);
-  console.log(userId);
   try {
     const user = await UserModel.aggregate([
       { $match: { 
@@ -42,7 +41,6 @@ export async function GET(req: Request) {
             })
           );  
     }
-    console.log(user);
     return new Response(
         JSON.stringify({
           success: true,

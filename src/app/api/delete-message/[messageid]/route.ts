@@ -26,8 +26,7 @@ export async function DELETE(
     const updateResult = await UserModel.updateOne(
       { _id: _user._id },
       { $pull: { messages: { _id: messageId } } }
-    );
-    console.log(updateResult);
+    )
     if (updateResult.modifiedCount === 0) {
       return new Response(
         JSON.stringify({

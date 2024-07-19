@@ -9,7 +9,6 @@ import { forgotPasswordEmail } from '@/lib/forgotPasswordEmail';
 export async function POST(req: Request) {
     await dbConnect();
     const { email } =await req.json();
-    console.log("req",email);
     const user = await UserModel.findOne({ email });
 
     if (!user) {
